@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Import tModLoader mod properties -->
+	<Import Project="..\tModLoader.targets" />
+	<Import Project="Shader.targets" />
+
+	<!-- General -->
+	<PropertyGroup>
+		
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Update="$(tMLSteamPath)$(tMLPath)" Publicize="true" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AssGen" OutputItemType="Analyzer" ReferenceOutputAssembly="false" Version="3.0.0" />
+		<AdditionalFiles Include="**/*.png" />
+
+	</ItemGroup>
+
+</Project>
