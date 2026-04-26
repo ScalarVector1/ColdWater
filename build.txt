@@ -1,3 +1,3 @@
-displayName = Template
-author = Template
+displayName = Cold Water
+author = ScalarVector1
 version = 0.1

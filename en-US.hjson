@@ -1,0 +1,10 @@
+Mods: {
+	ColdWater: {
+		Biomes: {
+			ColdWaterSceneEffect: {
+				DisplayName: Cold Water Scene Effect
+				TownNPCDialogueName: the Cold Water Scene Effect
+			}
+		}
+	}
+}
