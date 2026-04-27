@@ -1,3 +1,10 @@
+global using Microsoft.Xna.Framework;
+global using Microsoft.Xna.Framework.Graphics;
+global using ReLogic.Content;
+global using ColdWater.Core;
+global using Terraria;
+global using Terraria.Localization;
+global using Terraria.ModLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
