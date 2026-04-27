@@ -28,12 +28,12 @@ namespace ColdWater.Content.TemperatureSystem
 
 			if (!backCovered && Main.raining)
 			{
-				lossRate -= (int)(5 * Main.cloudAlpha);
+				lossRate += (int)(5 * Main.cloudAlpha);
 			}
 
 			if (Player.wet)
 			{
-				lossRate -= 50;
+				lossRate += 50;
 			}
 
 			if (temperature > lossRate)
@@ -46,6 +46,9 @@ namespace ColdWater.Content.TemperatureSystem
 				if (temperature < MAX_TEMP)
 					temperature += 1;
 			}
+
+			if (temperature > MAX_TEMP)
+				temperature = MAX_TEMP;
 
 			if (temperature <= 0)
 				Player.Hurt(PlayerDeathReason.ByCustomReason(new NetworkText($"{Player.name} froze to death.", NetworkText.Mode.Literal)), 999999, 0);

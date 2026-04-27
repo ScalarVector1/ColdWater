@@ -13,7 +13,7 @@ namespace ColdWater.Core
 	{
 		public static int waterTimer;
 
-		public int ticksTillWater => 30 + (int)((1f - Main.cloudAlpha) * 120);
+		public int ticksTillWater => 5 + (int)((1f - Main.cloudAlpha) * 120);
 
 		public int pickXNearPlayer()
 		{
@@ -52,7 +52,7 @@ namespace ColdWater.Core
 			}
 			else
 			{
-				if (waterTimer > 10)
+				if (waterTimer > 2)
 				{
 					int x = pickXNearPlayer();
 
