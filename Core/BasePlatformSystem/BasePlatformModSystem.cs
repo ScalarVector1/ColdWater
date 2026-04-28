@@ -19,7 +19,7 @@ namespace ColdWater.Core.BasePlatformSystem
 		public static Point16 baseTopLeft;
 		public static Point16 baseSize;
 
-		public static int baseBuildHeight = 100;
+		public static int baseBuildHeight = 40;
 
 		public static Rectangle BaseArea
 		{
@@ -52,7 +52,7 @@ namespace ColdWater.Core.BasePlatformSystem
 			Rectangle area = new Rectangle(baseTopLeft.X * 16 - (int)Main.screenPosition.X, baseTopLeft.Y * 16 - (int)Main.screenPosition.Y, baseSize.X * 16, baseSize.Y * 16);
 			var tex = Assets.MagicPixel.Value;
 
-			Main.spriteBatch.Draw(tex, area, new Color(60, 40, 80) * (0.1f * MathF.Sin(Main.GameUpdateCount * 0.01f) * 0.1f));
+			Main.spriteBatch.Draw(tex, area, new Color(60, 40, 80) * (0.2f + MathF.Sin(Main.GameUpdateCount * 0.05f) * 0.1f));
 
 			Main.spriteBatch.End();
 		}
@@ -83,10 +83,10 @@ namespace ColdWater.Core.BasePlatformSystem
 			if (saved.Length > 0)
 				miningBase = StructureData.FromStream(new BinaryReader(new MemoryStream(saved)));
 
-			int baseX = tag.GetInt("baseX");
-			int baseY = tag.GetInt("baseY");
-			int baseWidth = tag.GetInt("baseWidth");
-			int baseHeight = tag.GetInt("baseHeight");
+			int baseX = tag.GetShort("baseX");
+			int baseY = tag.GetShort("baseY");
+			int baseWidth = tag.GetShort("baseWidth");
+			int baseHeight = tag.GetShort("baseHeight");
 			baseBuildHeight = tag.GetInt("baseBuildHeight");
 
 			baseTopLeft = new Point16(baseX, baseY);

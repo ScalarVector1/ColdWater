@@ -16,6 +16,8 @@ namespace ColdWater.Content.Tiles
 			TileObjectData.newTile.Origin = new Point16(0, 0);
 			TileObjectData.newTile.CoordinateHeights = new[] { 16 };
 
+			TileObjectData.newTile.AnchorBottom = AnchorData.Empty;
+
 			TileObjectData.addTile(Type);
 
 			Main.tileSolid[Type] = true;
