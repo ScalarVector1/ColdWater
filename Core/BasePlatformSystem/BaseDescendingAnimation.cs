@@ -9,7 +9,7 @@ namespace ColdWater.Core.BasePlatformSystem
 {
 	internal class BaseDescendingAnimation : ModSystem
 	{
-		public static int duration = 300;
+		public static int duration = 390;
 
 		public static bool active;
 		public static int timer;
@@ -52,7 +52,7 @@ namespace ColdWater.Core.BasePlatformSystem
 				}
 
 				// Move players
-				if (timer > 0)
+				if (timer > 0 && timer < 310)
 				{
 					foreach (Player player in Main.ActivePlayers)
 					{
@@ -75,6 +75,20 @@ namespace ColdWater.Core.BasePlatformSystem
 				{
 					float prog = (timer - 90) / 210f;
 					baseVisualOffset += Vector2.UnitY * prog * 10;
+				}
+
+				if (timer == 310)
+				{
+					DescendingRegionSystem.PlaceBase();
+
+					foreach (Player player in Main.ActivePlayers)
+					{
+						if (initialPlayerOffsets.TryGetValue(player.whoAmI, out Vector2 offset))
+						{
+							player.Center = DescendingRegionSystem.BasePlacementLocation.ToVector2() * 16 + offset;
+							player.velocity *= 0;
+						}
+					}
 				}
 
 				if (timer < duration)
@@ -106,6 +120,34 @@ namespace ColdWater.Core.BasePlatformSystem
 				LightingBufferRenderer.DrawWithLighting(tex, BasePlatformModSystem.baseTopLeft.ToVector2() * 16 - Main.screenPosition + baseVisualOffset, Color.White);
 			}
 		}
+
+		public override void PostDrawInterface(SpriteBatch spriteBatch)
+		{
+			if (active)
+			{
+				if (timer > 240 && timer <= 300)
+				{
+					float fade = (timer - 240) / 60f;
+					var tex = Assets.MagicPixel.Value;
+
+					spriteBatch.Draw(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * fade);
+				}
+
+				if (timer > 300 && timer <= 330)
+				{
+					var tex = Assets.MagicPixel.Value;
+					spriteBatch.Draw(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black);
+				}
+
+				if (timer > 330)
+				{
+					float fade = 1f - (timer - 330) / 60f;
+					var tex = Assets.MagicPixel.Value;
+
+					spriteBatch.Draw(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * fade);
+				}
+			}
+		}
 	}
 
 	internal class BaseDescendingCameraModifier : ICameraModifier
@@ -117,7 +159,7 @@ namespace ColdWater.Core.BasePlatformSystem
 		public void Update(ref CameraInfo cameraPosition)
 		{
 			int timer = BaseDescendingAnimation.timer;
-			Main.NewText(timer);
+
 			Vector2 baseCenter = BasePlatformModSystem.BaseArea.Center() * 16 - Main.ScreenSize.ToVector2() / 2f;
 
 			if (timer < 60)
@@ -129,10 +171,15 @@ namespace ColdWater.Core.BasePlatformSystem
 				cameraPosition.CameraPosition = baseCenter;
 			}
 
-			if (timer > 90)
+			if (timer > 90 && timer < 330)
 			{
 				float prog = (timer - 90) / 210f;
 				cameraPosition.CameraPosition = baseCenter + BaseDescendingAnimation.baseVisualOffset * 0.75f;
+			}
+
+			if (timer > 330)
+			{
+				cameraPosition.CameraPosition = Vector2.SmoothStep(DescendingRegionSystem.BasePlacementLocation.ToVector2() * 16, cameraPosition.OriginalCameraPosition, (timer - 330) / 60f);
 			}
 		}
 	}

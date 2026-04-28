@@ -62,7 +62,7 @@ namespace ColdWater.Core.BasePlatformSystem
 			if (BaseArea.Width == 0 || BaseArea.Height == 0)
 				return;
 
-			CopyInBase();
+			miningBase = StructureData.FromWorld(BaseArea.X, BaseArea.Y, BaseArea.Width, BaseArea.Height);
 
 			var stream = new MemoryStream();
 			BinaryWriter writer = new BinaryWriter(stream);
