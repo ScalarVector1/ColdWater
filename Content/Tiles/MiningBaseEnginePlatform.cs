@@ -38,8 +38,16 @@ namespace ColdWater.Content.Tiles
 
 		public override bool RightClick(int i, int j)
 		{
-			BaseDescendingAnimation.active = true;
-			BaseDescendingAnimation.timer = 0;
+			if (j < DescendingRegionSystem.DescendingRegionStart)
+			{
+				BaseDescendingAnimation.active = true;
+				BaseDescendingAnimation.timer = 0;
+			}
+
+			if (j > DescendingRegionSystem.DescendingRegionEnd)
+			{
+				// Ascend
+			}
 
 			return true;
 		}
