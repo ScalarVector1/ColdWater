@@ -6,5 +6,12 @@ Mods: {
 				TownNPCDialogueName: the Cold Water Scene Effect
 			}
 		}
+
+		Items: {
+			MiningBasePlatformItem: {
+				DisplayName: Mining Base Platform Item
+				Tooltip: ""
+			}
+		}
 	}
 }

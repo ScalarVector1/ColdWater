@@ -1,3 +1,4 @@
 displayName = Cold Water
 author = ScalarVector1
 version = 0.1
+dllReferences = StructureHelper
