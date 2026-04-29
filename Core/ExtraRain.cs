@@ -65,7 +65,7 @@ namespace ColdWater.Core
 
 		private void AddExtraRain(On_Main.orig_DoDraw_WallsTilesNPCs orig, Main self)
 		{
-			if (Main.raining)
+			if (Main.raining && Main.LocalPlayer.Center.Y < Main.worldSurface * 16)
 			{
 				var tex = Assets.LineAlpha.Value;
 				Random rand = new(1892639812);
