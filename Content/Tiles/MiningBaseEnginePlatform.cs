@@ -44,6 +44,13 @@ namespace ColdWater.Content.Tiles
 				BaseDescendingAnimation.timer = 0;
 			}
 
+			if (j > DescendingRegionSystem.DescendingRegionStart && j < DescendingRegionSystem.DescendingRegionEnd)
+			{
+				// Debug
+				DescendingRegionSystem.descendingActive = false;
+				Main.LocalPlayer.Center = BasePlatformModSystem.BaseArea.Center.ToVector2() * 16;
+			}
+
 			if (j > DescendingRegionSystem.DescendingRegionEnd)
 			{
 				// Ascend

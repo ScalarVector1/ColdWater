@@ -3,9 +3,9 @@ float4x4 zoom;
 float4x4 sampleTrans;
 
 texture targetTexture;
-sampler2D targetTex = sampler_state { texture = <targetTexture>; };
+sampler2D targetTex = sampler_state { texture = <targetTexture>; AddressU = wrap; AddressV = wrap;};
 texture sampleTexture;
-sampler2D sampleTex = sampler_state { texture = <sampleTexture>; };
+sampler2D sampleTex = sampler_state { texture = <sampleTexture>; AddressU = wrap; AddressV = wrap;};
 
 
 struct VertexShaderInput

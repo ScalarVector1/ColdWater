@@ -9,7 +9,7 @@ namespace ColdWater.Core.BasePlatformSystem
 {
 	internal class BaseDescendingAnimation : ModSystem
 	{
-		public static int duration = 390;
+		public static int duration = 450;
 
 		public static bool active;
 		public static int timer;
@@ -80,6 +80,7 @@ namespace ColdWater.Core.BasePlatformSystem
 				if (timer == 310)
 				{
 					DescendingRegionSystem.PlaceBase();
+					DescendingRegionSystem.descendingActive = true;
 
 					foreach (Player player in Main.ActivePlayers)
 					{
@@ -141,7 +142,7 @@ namespace ColdWater.Core.BasePlatformSystem
 
 				if (timer > 330)
 				{
-					float fade = 1f - (timer - 330) / 60f;
+					float fade = 1f - (timer - 330) / 30f;
 					var tex = Assets.MagicPixel.Value;
 
 					spriteBatch.Draw(tex, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * fade);
@@ -177,9 +178,12 @@ namespace ColdWater.Core.BasePlatformSystem
 				cameraPosition.CameraPosition = baseCenter + BaseDescendingAnimation.baseVisualOffset * 0.75f;
 			}
 
-			if (timer > 330)
+			if (timer > 330 && timer <= 450)
 			{
-				cameraPosition.CameraPosition = Vector2.SmoothStep(DescendingRegionSystem.BasePlacementLocation.ToVector2() * 16, cameraPosition.OriginalCameraPosition, (timer - 330) / 60f);
+				var basePos = DescendingRegionSystem.BaseWorldCenter - Main.ScreenSize.ToVector2() / 2f;
+				basePos.Y = cameraPosition.OriginalCameraPosition.Y;
+
+				cameraPosition.CameraPosition = Vector2.SmoothStep(basePos + Vector2.UnitY * (Main.screenHeight / 2f + 200), cameraPosition.OriginalCameraPosition, (timer - 330) / 120f);
 			}
 		}
 	}
