@@ -55,28 +55,34 @@ namespace ColdWater.Content.UI
 
 			float tempPercent = Main.LocalPlayer.GetModPlayer<TemperaturePlayer>().temperature / (float)TemperaturePlayer.MAX_TEMP;
 
-			int fillWidth = 30 + (int)((texFill0.Width - 36) * tempPercent);
-			spriteBatch.Draw(texBack, pos, Color.White);
-			spriteBatch.Draw(texFill0, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, texFill0.Height), new Rectangle(0, 0, fillWidth, texFill0.Height), Color.White);
+			float scaleFactor = GetDimensions().Width / 240f;
+			int fillWidth = (int)(scaleFactor * (30 + (texFill0.Width - 36) * tempPercent));
+			int fillHeight = (int)GetDimensions().Height;
+
+			int fillWidthS = (int)(30 + (texFill0.Width - 36) * tempPercent);
+			int fillHeightS = texFill0.Height;
+
+			spriteBatch.Draw(texBack, GetDimensions().ToRectangle(), Color.White);
+			spriteBatch.Draw(texFill0, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, fillHeight), new Rectangle(0, 0, fillWidthS, fillHeightS), Color.White);
 
 			float blueOpacity = Math.Clamp((tempPercent - 0.2f) / 0.8f, 0, 1);
-			spriteBatch.Draw(texFill1, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, texFill0.Height), new Rectangle(0, 0, fillWidth, texFill0.Height), Color.White * blueOpacity);
+			spriteBatch.Draw(texFill1, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, fillHeight), new Rectangle(0, 0, fillWidthS, fillHeightS), Color.White * blueOpacity);
 
 			float purpleOpacity = Math.Clamp((tempPercent - 0.4f) / 0.6f, 0, 1);
-			spriteBatch.Draw(texFill2, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, texFill0.Height), new Rectangle(0, 0, fillWidth, texFill0.Height), Color.White * purpleOpacity);
+			spriteBatch.Draw(texFill2, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, fillHeight), new Rectangle(0, 0, fillWidthS, fillHeightS), Color.White * purpleOpacity);
 
 			float orangeOpacity = Math.Clamp((tempPercent - 0.6f) / 0.4f, 0, 1);
-			spriteBatch.Draw(texFill3, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, texFill0.Height), new Rectangle(0, 0, fillWidth, texFill0.Height), Color.White * orangeOpacity);
+			spriteBatch.Draw(texFill3, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, fillHeight), new Rectangle(0, 0, fillWidthS, fillHeightS), Color.White * orangeOpacity);
 
-			spriteBatch.Draw(texFront, pos, Color.White);
+			spriteBatch.Draw(texFront, GetDimensions().ToRectangle(), Color.White);
 
 			var texNub = Assets.UI.ThermostatNubs.Value;
 
 			int damageNubX = 30 + (int)((texFill0.Width - 36) * Main.LocalPlayer.GetModPlayer<TemperaturePlayer>().damageThresh / (float)TemperaturePlayer.MAX_TEMP) - 8;
 			int toolNubX = 30 + (int)((texFill0.Width - 36) * Main.LocalPlayer.GetModPlayer<TemperaturePlayer>().toolThresh / (float)TemperaturePlayer.MAX_TEMP) - 8;
 
-			spriteBatch.Draw(texNub, pos + new Vector2(damageNubX, 4), new Rectangle(16 * 0, 0, 14, texNub.Height), Color.White);
-			spriteBatch.Draw(texNub, pos + new Vector2(toolNubX, 4), new Rectangle(16 * 2, 0, 14, texNub.Height), Color.White);
+			spriteBatch.Draw(texNub, pos + scaleFactor * new Vector2(damageNubX, 4), new Rectangle(16 * 0, 0, 14, texNub.Height), Color.White, 0, default, scaleFactor, 0, 0);
+			spriteBatch.Draw(texNub, pos + scaleFactor * new Vector2(toolNubX, 4), new Rectangle(16 * 2, 0, 14, texNub.Height), Color.White, 0, default, scaleFactor, 0, 0);
 		}
 	}
 }
