@@ -115,10 +115,17 @@ namespace ColdWater.Core.BasePlatformSystem
 
 		public override void PostDrawTiles()
 		{
+			if (active)
+			{
+				BasePlatformModSystem.targetNeedsRendered = true;
+			}
+
 			if (active && timer >= 10)
 			{
-				var tex = BasePlatformModSystem.baseTexture.preview;
-				LightingBufferRenderer.DrawWithLighting(tex, BasePlatformModSystem.baseTopLeft.ToVector2() * 16 - Main.screenPosition + baseVisualOffset, Color.White);
+				var tex = BasePlatformModSystem.baseRenderTarget;
+
+				if (tex != null)
+					LightingBufferRenderer.DrawWithLighting(tex, BasePlatformModSystem.baseTopLeft.ToVector2() * 16 - Main.screenPosition + baseVisualOffset, Color.White);
 			}
 		}
 

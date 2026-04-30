@@ -1,23 +1,33 @@
-﻿using StructureHelper.Util;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StructureHelper.Models;
+using StructureHelper.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent.Events;
+using Terraria.Graphics;
+using Terraria.Graphics.Capture;
+using Terraria.Graphics.Light;
 using Terraria.ModLoader.IO;
+using static Terraria.GameContent.Bestiary.BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions;
 
 namespace ColdWater.Core.BasePlatformSystem
 {
 	internal class BasePlatformModSystem : ModSystem
 	{
 		public static StructureData miningBase;
-		public static StructurePreview baseTexture;
+		public static RenderTarget2D baseRenderTarget;
 
 		public static Point16 baseTopLeft;
 		public static Point16 baseSize;
+
+		public static bool targetNeedsRendered;
+		public static bool targetBeingRendered;
 
 		public static int baseBuildHeight = 40;
 
@@ -35,14 +45,129 @@ namespace ColdWater.Core.BasePlatformSystem
 		{
 			// This should load the preview rendering queue for the SH assembly embeded into this mod?
 			new PreviewRenderQueue().Load(Mod);
+
+			On_Main.DoDraw += RenderBaseTargeet;
+			On_LightingEngine.GetColor += WhiteDuringTarget;
+		}
+
+		private Vector3 WhiteDuringTarget(On_LightingEngine.orig_GetColor orig, LightingEngine self, int x, int y)
+		{
+			if (targetBeingRendered)
+				return Vector3.One;
+			else
+				return orig(self, x, y);
+		}
+
+		private void RenderBaseTargeet(On_Main.orig_DoDraw orig, Main self, GameTime gameTime)
+		{
+			if (!Main.dedServ && targetNeedsRendered)
+			{
+				CheckAndUpdateTargetSize();
+
+				Main.graphics.GraphicsDevice.SetRenderTarget(baseRenderTarget);
+				Main.graphics.GraphicsDevice.Clear(Color.Transparent);
+
+				var oldWidth = Main.screenWidth;
+				var oldHeight = Main.screenHeight;
+				var oldPos = Main.screenPosition;
+				var oldTranslation = Main.GameViewMatrix._translation;
+
+				var descendingCopyLocation = DescendingRegionSystem.BasePlacementLocation;
+
+				Main.screenWidth = baseSize.X << 4;
+				Main.screenHeight = baseSize.Y << 4;
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16) + Vector2.One * Main.offScreenRange;
+				Main.GameViewMatrix._translation = Vector2.Zero;
+
+				Main.instance.TilesRenderer.PrepareForAreaDrawing(descendingCopyLocation.X, descendingCopyLocation.X + baseSize.X, descendingCopyLocation.Y, descendingCopyLocation.Y + baseSize.Y, prepareLazily: false);
+				Main.instance.TilePaintSystem.PrepareAllRequests();
+
+				targetBeingRendered = true;
+
+				var tileBatch = Main.tileBatch;
+				var spriteBatch = Main.spriteBatch;
+
+				tileBatch.Begin();
+				spriteBatch.Begin();
+				Main.instance.DrawWalls();
+				tileBatch.End();
+				spriteBatch.End();
+
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16);
+
+				bool flag3 = false;
+				bool intoRenderTargets = false;
+				bool intoRenderTargets2 = false;
+				Main.instance.TilesRenderer.SpecificHacksForCapture();				
+
+				Main.instance.TilesRenderer.PreDrawTiles(solidLayer: false, flag3, intoRenderTargets2);
+
+				tileBatch.Begin();
+				spriteBatch.Begin();
+
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16) + Vector2.One * Main.offScreenRange;
+
+				Main.instance.DrawTiles(solidLayer: false, flag3, intoRenderTargets);
+
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16);
+
+				tileBatch.End();
+				spriteBatch.End();
+				Main.instance.DrawTileEntities(solidLayer: false, flag3, intoRenderTargets);
+
+				spriteBatch.Begin();
+				tileBatch.Begin();
+				Main.instance.waterfallManager.FindWaterfalls(forced: true);
+				Main.instance.waterfallManager.Draw(spriteBatch);
+				tileBatch.End();
+				spriteBatch.End();
+
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16) + Vector2.One * Main.offScreenRange;
+
+				Main.instance.TilesRenderer.PreDrawTiles(solidLayer: true, flag3, intoRenderTargets2);
+				tileBatch.Begin();
+				spriteBatch.Begin();
+
+				Main.instance.DrawTiles(solidLayer: true, flag3, intoRenderTargets);
+
+				tileBatch.End();
+				spriteBatch.End();
+				Main.instance.DrawTileEntities(solidLayer: true, flag3, intoRenderTargets);
+
+				tileBatch.Begin();
+				spriteBatch.Begin();
+
+				Main.instance.DrawLiquid(bg: false, Main.waterStyle);
+
+				tileBatch.End();
+				spriteBatch.End();
+
+				Main.graphics.GraphicsDevice.SetRenderTarget(null);
+
+				Main.screenWidth = oldWidth;
+				Main.screenHeight = oldHeight;
+				Main.screenPosition = oldPos;
+				Main.GameViewMatrix._translation = oldTranslation;
+
+				targetBeingRendered = false;
+			}
+
+			orig(self, gameTime);
+		}
+
+		private void CheckAndUpdateTargetSize()
+		{
+			if (baseRenderTarget is null || baseRenderTarget.IsDisposed || baseRenderTarget.Width != baseSize.X * 16 || baseRenderTarget.Height != baseSize.Y * 16)
+			{
+				baseRenderTarget?.Dispose();
+				baseRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, baseSize.X * 16, baseSize.Y * 16, false, default, default, default, RenderTargetUsage.PreserveContents);
+			}
 		}
 
 		public static void CopyInBase()
 		{
 			miningBase = StructureData.FromWorld(BaseArea.X, BaseArea.Y, BaseArea.Width, BaseArea.Height);
-
-			baseTexture?.Dispose();
-			baseTexture = new StructurePreview("", miningBase);
+			DescendingRegionSystem.PlaceBase();
 		}
 
 		public override void PostDrawTiles()
