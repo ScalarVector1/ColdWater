@@ -14,10 +14,24 @@ using Terraria.Graphics;
 using Terraria.Graphics.Capture;
 using Terraria.Graphics.Light;
 using Terraria.ModLoader.IO;
-using static Terraria.GameContent.Bestiary.BestiaryDatabaseNPCsPopulator.CommonTags.SpawnConditions;
+using ColdWater.Core.UndergroundLevelSystem;
+using Terraria.ObjectData;
+using Terraria.ID;
 
 namespace ColdWater.Core.BasePlatformSystem
 {
+	internal struct LightPoint
+	{
+		public Vector2 offset;
+		public Vector3 color;
+
+		public LightPoint(Vector2 offset, Vector3 color)
+		{
+			this.offset = offset;
+			this.color = color;
+		}
+	}
+
 	internal class BasePlatformModSystem : ModSystem
 	{
 		public static StructureData miningBase;
@@ -30,6 +44,8 @@ namespace ColdWater.Core.BasePlatformSystem
 		public static bool targetBeingRendered;
 
 		public static int baseBuildHeight = 40;
+
+		public static List<LightPoint> baseLights = new();
 
 		public static Rectangle BaseArea
 		{
@@ -72,7 +88,7 @@ namespace ColdWater.Core.BasePlatformSystem
 				var oldPos = Main.screenPosition;
 				var oldTranslation = Main.GameViewMatrix._translation;
 
-				var descendingCopyLocation = DescendingRegionSystem.BasePlacementLocation;
+				var descendingCopyLocation = UndergroundLevelModSystem.DescendingBasePlacementLocation;
 
 				Main.screenWidth = baseSize.X << 4;
 				Main.screenHeight = baseSize.Y << 4;
@@ -164,10 +180,33 @@ namespace ColdWater.Core.BasePlatformSystem
 			}
 		}
 
-		public static void CopyInBase()
+		public static void SaveAndCopyBaseToDescendingRegion()
 		{
+			baseLights.Clear();
+
+			for (int x = baseTopLeft.X; x < baseTopLeft.X + baseSize.X; x++)
+			{
+				for (int y = baseTopLeft.Y; y < baseTopLeft.Y + baseSize.Y; y++)
+				{
+					var tile = Main.tile[x, y];
+					if (Main.tileLighted[tile.TileType])
+					{
+						Lighting.NewEngine._tileScanner.GetTileLight(x, y, out Vector3 color);
+						baseLights.Add(new(new Vector2((x - baseTopLeft.X) * 16, (y - baseTopLeft.Y) * 16), color));
+					}
+				}
+			}
+
 			miningBase = StructureData.FromWorld(BaseArea.X, BaseArea.Y, BaseArea.Width, BaseArea.Height);
-			DescendingRegionSystem.PlaceBase();
+			UndergroundLevelModSystem.PlaceBase();
+		}
+
+		public static void ApplyBaseLights(Vector2 pos)
+		{
+			foreach (var light in baseLights)
+			{
+				Lighting.AddLight(pos + light.offset, light.color);
+			}
 		}
 
 		public override void PostDrawTiles()

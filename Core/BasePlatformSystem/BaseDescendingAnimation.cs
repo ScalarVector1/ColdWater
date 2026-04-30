@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria.Graphics.CameraModifiers;
+using ColdWater.Core.UndergroundLevelSystem;
 
 namespace ColdWater.Core.BasePlatformSystem
 {
@@ -36,7 +37,7 @@ namespace ColdWater.Core.BasePlatformSystem
 						initialPlayerOffsets[player.whoAmI] = player.Center - basePos;
 					}
 
-					BasePlatformModSystem.CopyInBase();
+					BasePlatformModSystem.SaveAndCopyBaseToDescendingRegion();
 				}
 
 				if (timer == 10) // Slight delay to allow time to generate preview texture in an attempt to prevent visual gap
@@ -79,14 +80,13 @@ namespace ColdWater.Core.BasePlatformSystem
 
 				if (timer == 310)
 				{
-					DescendingRegionSystem.PlaceBase();
-					DescendingRegionSystem.descendingActive = true;
+					UndergroundLevelModSystem.StartDescent();
 
 					foreach (Player player in Main.ActivePlayers)
 					{
 						if (initialPlayerOffsets.TryGetValue(player.whoAmI, out Vector2 offset))
 						{
-							player.Center = DescendingRegionSystem.BasePlacementLocation.ToVector2() * 16 + offset;
+							player.Center = UndergroundLevelModSystem.DescendingBasePlacementLocation.ToVector2() * 16 + offset;
 							player.velocity *= 0;
 						}
 					}
@@ -98,7 +98,7 @@ namespace ColdWater.Core.BasePlatformSystem
 				}
 				else
 				{
-					//TEMP: Replace
+					//Replace base at surface
 					StructureHelper.API.Generator.GenerateFromData(BasePlatformModSystem.miningBase, BasePlatformModSystem.baseTopLeft);
 
 					active = false;
@@ -122,10 +122,13 @@ namespace ColdWater.Core.BasePlatformSystem
 
 			if (active && timer >= 10)
 			{
+				var pos = BasePlatformModSystem.baseTopLeft.ToVector2() * 16 + baseVisualOffset;
 				var tex = BasePlatformModSystem.baseRenderTarget;
 
+				BasePlatformModSystem.ApplyBaseLights(pos);
+
 				if (tex != null)
-					LightingBufferRenderer.DrawWithLighting(tex, BasePlatformModSystem.baseTopLeft.ToVector2() * 16 - Main.screenPosition + baseVisualOffset, Color.White);
+					LightingBufferRenderer.DrawWithLighting(tex, pos - Main.screenPosition, Color.White);
 			}
 		}
 
@@ -187,7 +190,7 @@ namespace ColdWater.Core.BasePlatformSystem
 
 			if (timer > 330 && timer <= 450)
 			{
-				var basePos = DescendingRegionSystem.BaseWorldCenter - Main.ScreenSize.ToVector2() / 2f;
+				var basePos = UndergroundLevelModSystem.DescendingBaseWorldCenter - Main.ScreenSize.ToVector2() / 2f;
 				basePos.Y = cameraPosition.OriginalCameraPosition.Y;
 
 				cameraPosition.CameraPosition = Vector2.SmoothStep(basePos + Vector2.UnitY * (Main.screenHeight / 2f + 200), cameraPosition.OriginalCameraPosition, (timer - 330) / 120f);

@@ -13,7 +13,7 @@ namespace ColdWater.Content.UI
 	{
 		public UIPanel panelOrange;
 
-		public override bool Visible => true;
+		public override bool Visible => false;
 
 		public override int InsertionIndex(List<GameInterfaceLayer> layers)
 		{

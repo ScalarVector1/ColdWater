@@ -3,6 +3,8 @@ using Terraria.ObjectData;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using ColdWater.Core.BasePlatformSystem;
+using ColdWater.Core.UndergroundLevelSystem;
+using ColdWater.Content.Levels;
 
 namespace ColdWater.Content.Tiles
 {
@@ -38,20 +40,19 @@ namespace ColdWater.Content.Tiles
 
 		public override bool RightClick(int i, int j)
 		{
-			if (j < DescendingRegionSystem.DescendingRegionStart)
+			if (j < UndergroundLevelModSystem.DescendingRegionStart)
 			{
-				BaseDescendingAnimation.active = true;
-				BaseDescendingAnimation.timer = 0;
+				UndergroundLevelModSystem.ActivateLevel(ModContent.GetInstance<DemoLevel>());
 			}
 
-			if (j > DescendingRegionSystem.DescendingRegionStart && j < DescendingRegionSystem.DescendingRegionEnd)
+			if (j > UndergroundLevelModSystem.DescendingRegionStart && j < UndergroundLevelModSystem.DescendingRegionEnd)
 			{
 				// Debug
-				DescendingRegionSystem.descendingActive = false;
+				UndergroundLevelModSystem.activeState = UndergroundLevelState.Surface;
 				Main.LocalPlayer.Center = BasePlatformModSystem.BaseArea.Center.ToVector2() * 16;
 			}
 
-			if (j > DescendingRegionSystem.DescendingRegionEnd)
+			if (j > UndergroundLevelModSystem.DescendingRegionEnd)
 			{
 				// Ascend
 			}
