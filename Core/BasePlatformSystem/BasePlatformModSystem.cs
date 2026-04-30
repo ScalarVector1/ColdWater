@@ -198,7 +198,7 @@ namespace ColdWater.Core.BasePlatformSystem
 			}
 
 			miningBase = StructureData.FromWorld(BaseArea.X, BaseArea.Y, BaseArea.Width, BaseArea.Height);
-			UndergroundLevelModSystem.PlaceBase();
+			UndergroundLevelModSystem.PlaceBaseDescending();
 		}
 
 		public static void ApplyBaseLights(Vector2 pos)

@@ -29,14 +29,17 @@ namespace ColdWater.Core.UndergroundLevelSystem
 
 		public static int DescendingRegionStart => (int)Main.worldSurface + 100;
 		public static int DescendingRegionEnd => (int)Main.worldSurface + 300;
+		public static Rectangle DescendingRegion => new(0, DescendingRegionStart, Main.maxTilesX, DescendingRegionEnd - DescendingRegionStart);
 
 		public static int LevelRegionStart => (int)Main.worldSurface + 310;
 		public static int LevelRegionEnd => Main.maxTilesY - 300;
-		public static Rectangle LevelRect => new(0, LevelRegionStart, Main.maxTilesX, LevelRegionEnd - LevelRegionStart);
+		public static Rectangle LevelRegion => new(0, LevelRegionStart, Main.maxTilesX, LevelRegionEnd - LevelRegionStart);
 
-		public static Rectangle DescendingRegion => new(0, DescendingRegionStart, Main.maxTilesX, DescendingRegionEnd - DescendingRegionStart);
 		public static Point16 DescendingBasePlacementLocation => new(Main.maxTilesX / 2 - BasePlatformModSystem.miningBase.width / 2, DescendingRegionEnd - BasePlatformModSystem.miningBase.height - 80);
 		public static Vector2 DescendingBaseWorldCenter => DescendingBasePlacementLocation.ToVector2() * 16 + BasePlatformModSystem.baseSize.ToVector2() * 8;
+
+		public static Point16 LevelBasePlacementLocation => new(LevelRegion.Center.X - BasePlatformModSystem.miningBase.width / 2, LevelRegion.Center.Y - BasePlatformModSystem.miningBase.height);
+		public static Vector2 LevelBaseWorldCenter => LevelBasePlacementLocation.ToVector2() * 16 + BasePlatformModSystem.baseSize.ToVector2() * 8;
 
 		public override void Load()
 		{
@@ -100,7 +103,7 @@ namespace ColdWater.Core.UndergroundLevelSystem
 			{			
 				if (descendCounter == 0 && Main.netMode != NetmodeID.MultiplayerClient)
 				{
-					generationTask = Task.Run(() => activeLevel.GenerateLevel(LevelRect));
+					generationTask = Task.Run(() => activeLevel.GenerateLevel(LevelRegion));
 				}
 
 				activeLevel.UpdateInDescent();
@@ -113,10 +116,10 @@ namespace ColdWater.Core.UndergroundLevelSystem
 				}
 				else
 				{
-					if (activeLevel.canFinishDescent && generationTask.IsCompleted)
+					if (activeLevel.canFinishDescent && generationTask.IsCompleted && !BaseArrivingAnimation.active)
 					{
-						Main.NewText("Level begin");
-						// Finish descent
+						BaseArrivingAnimation.active = true;
+						BaseArrivingAnimation.timer = 0;
 					}
 				}
 
@@ -146,9 +149,14 @@ namespace ColdWater.Core.UndergroundLevelSystem
 			}
 		}
 
-		public static void PlaceBase()
+		public static void PlaceBaseDescending()
 		{
 			StructureHelper.API.Generator.GenerateFromData(BasePlatformModSystem.miningBase, DescendingBasePlacementLocation);
+		}
+
+		public static void PlaceBaseLevel()
+		{
+			StructureHelper.API.Generator.GenerateFromData(BasePlatformModSystem.miningBase, LevelBasePlacementLocation);
 		}
 	}
 

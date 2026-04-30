@@ -13,6 +13,7 @@ namespace ColdWater.Content.Levels
 	{
 		public override void SetDefaults()
 		{
+			descentDuration = 300;
 			backgroundTexture = Assets.Background.DirtScroll;
 			backgroundEdgeTexture = Assets.Background.DirtSide;
 		}
