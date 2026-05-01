@@ -16,11 +16,15 @@ namespace ColdWater.Content.Levels
 			descentDuration = 300;
 			backgroundTexture = Assets.Background.DirtScroll;
 			backgroundEdgeTexture = Assets.Background.DirtSide;
+			loopTexture = Assets.Background.DirtLoop;
+			edgeTexture = Assets.Background.DirtEdge;
 		}
 
 		public override void UpdateInDescent()
 		{
-			if (UndergroundLevelModSystem.descendCounter % 60 == 0)
+			canFinishDescent = Main.LocalPlayer.controlHook;
+
+			if (UndergroundLevelModSystem.descendCounter % 600 == 0)
 				NPC.NewNPC(null, (int)UndergroundLevelModSystem.DescendingBaseWorldCenter.X, (int)UndergroundLevelModSystem.DescendingBaseWorldCenter.Y, NPCID.Zombie);
 		}
 

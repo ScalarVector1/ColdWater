@@ -14,6 +14,9 @@ namespace ColdWater.Core.UndergroundLevelSystem
 	{
 		public Asset<Texture2D> backgroundTexture;
 		public Asset<Texture2D> backgroundEdgeTexture;
+		public Asset<Texture2D> loopTexture;
+		public Asset<Texture2D> edgeTexture;
+
 		public int descentDustType;
 
 		/// <summary>
@@ -87,6 +90,15 @@ namespace ColdWater.Core.UndergroundLevelSystem
 
 			edgeSource = new Rectangle(0, (int)(timer * 13 % edge.Height + Main.screenPosition.Y), edge.Width, Main.screenHeight);
 			LightingBufferRenderer.DrawWithLighting(edge, GetParallax(rightPos + Vector2.UnitX * 260, parallaxBase, 0.2f, edge.Width), edgeSource, new Color(190, 190, 190), 0, Vector2.UnitX * edge.Width / 2, Vector2.One);
+
+			// Bottom of the dirt
+			var tex2 = loopTexture.Value;
+			var bottSource = new Rectangle(0, (int)(timer * 16 % tex2.Height), Main.screenWidth, Main.screenHeight / 2);
+			LightingBufferRenderer.DrawWithLighting(tex2, new Vector2(0, UndergroundLevelModSystem.DescendingBaseWorldCenter.Y + BasePlatformModSystem.baseSize.Y * 8 + 68 - Main.screenPosition.Y), bottSource, Color.White, 0, Vector2.UnitX * edge.Width / 2, Vector2.One);
+
+			var tex3 = edgeTexture.Value;
+			var bottEdgeSource = new Rectangle(0, 0, Main.screenWidth, 4);
+			LightingBufferRenderer.DrawWithLighting(tex3, new Vector2(0, UndergroundLevelModSystem.DescendingBaseWorldCenter.Y + BasePlatformModSystem.baseSize.Y * 8 + 64 - Main.screenPosition.Y), bottEdgeSource, Color.White, 0, Vector2.UnitX * edge.Width / 2, Vector2.One);
 		}
 
 		/// <summary>

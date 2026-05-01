@@ -99,6 +99,9 @@ namespace ColdWater.Core.UndergroundLevelSystem
 
 		public override void PostUpdateEverything()
 		{
+			//TEMP
+			BasePlatformModSystem.engineRotationForVisuals += 0.02f * (Main.MouseScreen.X / Main.screenWidth);
+
 			if (Descending)
 			{			
 				if (descendCounter == 0 && Main.netMode != NetmodeID.MultiplayerClient)

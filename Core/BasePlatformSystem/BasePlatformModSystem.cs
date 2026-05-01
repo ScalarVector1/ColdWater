@@ -45,6 +45,8 @@ namespace ColdWater.Core.BasePlatformSystem
 
 		public static int baseBuildHeight = 40;
 
+		public static float engineRotationForVisuals;
+
 		public static List<LightPoint> baseLights = new();
 
 		public static Rectangle BaseArea
@@ -148,11 +150,12 @@ namespace ColdWater.Core.BasePlatformSystem
 
 				tileBatch.End();
 				spriteBatch.End();
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16);
 				Main.instance.DrawTileEntities(solidLayer: true, flag3, intoRenderTargets);
 
 				tileBatch.Begin();
 				spriteBatch.Begin();
-
+				Main.screenPosition = new Vector2(descendingCopyLocation.X * 16, descendingCopyLocation.Y * 16) + Vector2.One * Main.offScreenRange;
 				Main.instance.DrawLiquid(bg: false, Main.waterStyle);
 
 				tileBatch.End();
@@ -173,10 +176,10 @@ namespace ColdWater.Core.BasePlatformSystem
 
 		private void CheckAndUpdateTargetSize()
 		{
-			if (baseRenderTarget is null || baseRenderTarget.IsDisposed || baseRenderTarget.Width != baseSize.X * 16 || baseRenderTarget.Height != baseSize.Y * 16)
+			if (baseRenderTarget is null || baseRenderTarget.IsDisposed || baseRenderTarget.Width != baseSize.X * 16 || baseRenderTarget.Height != baseSize.Y * 16 + 82)
 			{
 				baseRenderTarget?.Dispose();
-				baseRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, baseSize.X * 16, baseSize.Y * 16, false, default, default, default, RenderTargetUsage.PreserveContents);
+				baseRenderTarget = new RenderTarget2D(Main.graphics.GraphicsDevice, baseSize.X * 16, baseSize.Y * 16 + 82, false, default, default, default, RenderTargetUsage.PreserveContents);
 			}
 		}
 
@@ -217,6 +220,8 @@ namespace ColdWater.Core.BasePlatformSystem
 			var tex = Assets.MagicPixel.Value;
 
 			Main.spriteBatch.Draw(tex, area, new Color(60, 40, 80) * (0.2f + MathF.Sin(Main.GameUpdateCount * 0.05f) * 0.1f));
+
+			//Main.spriteBatch.Draw(baseRenderTarget, Main.MouseScreen, Color.White);
 
 			Main.spriteBatch.End();
 		}

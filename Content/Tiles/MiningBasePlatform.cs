@@ -3,6 +3,8 @@ using Terraria.ObjectData;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using ColdWater.Core.BasePlatformSystem;
+using System;
+using ColdWater.Core.UndergroundLevelSystem;
 
 namespace ColdWater.Content.Tiles
 {
@@ -85,6 +87,54 @@ namespace ColdWater.Content.Tiles
 				BasePlatformModSystem.baseTopLeft = new Point16(pos.X, pos.Y - BasePlatformModSystem.baseBuildHeight);
 				BasePlatformModSystem.baseSize = new Point16(16, BasePlatformModSystem.baseBuildHeight + 1);
 			}
+		}
+
+		public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+		{
+			var tile = Main.tile[i, j];
+
+			if (tile.frameX == 0)
+			{
+				Main.instance.TilesRenderer.AddSpecialPoint(i, j, Terraria.GameContent.Drawing.TileDrawing.TileCounterType.CustomSolid);
+
+				if (UndergroundLevelModSystem.Descending)
+				{
+					Vector2 pos = new Vector2(i + 8, j + 2) * 16;
+					Dust.NewDustPerfect(pos, UndergroundLevelModSystem.activeLevel.descentDustType, Vector2.UnitY.RotatedByRandom(0.4f) * -Main.rand.NextFloat(2f, 20f), 0, default, Main.rand.NextFloat(1f, 2f));
+				}
+			}
+		}
+
+		public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
+		{
+			Vector2 center = new Vector2(i + 8, j) * 16;
+
+			DrawWheel(spriteBatch, center + new Vector2(-24 - 62, 42), Color.Gray, -3f);
+			DrawWheel(spriteBatch, center + new Vector2(24 - 62, 42), Color.Gray, 3f);
+
+			DrawWheel(spriteBatch, center + new Vector2(-24 + 62, 42), Color.Gray, -3f);
+			DrawWheel(spriteBatch, center + new Vector2(24 + 62, 42), Color.Gray, 3f);
+
+			DrawWheel(spriteBatch, center + new Vector2(-24, 56), Color.White, -3f);
+			DrawWheel(spriteBatch, center + new Vector2(24, 56), Color.White, 3f);
+
+			var tex = Assets.Tiles.MiningBaseScaffold.Value;
+
+			for(int x = 0; x < tex.Width; x += 8)
+			{
+				for (int y = 0; y < tex.Height; y += 8)
+				{
+					var pos = new Vector2(i, j) * 16 + new Vector2(x, y);
+					spriteBatch.Draw(tex, pos - Main.screenPosition, new Rectangle(x, y, 8, 8), new Color(Lighting.GetSubLight(pos)), 0, Vector2.Zero, 1f, 0, 0);
+				}
+			}
+		}
+
+		public void DrawWheel(SpriteBatch spriteBatch, Vector2 pos, Color color, float speed)
+		{
+			var tex = Assets.Tiles.CuttingWheel.Value;
+
+			spriteBatch.Draw(tex, pos - Main.screenPosition, null, Lighting.GetColor((pos / 16).ToPoint()).MultiplyRGB(color), BasePlatformModSystem.engineRotationForVisuals * speed, tex.Size() / 2f, 1f, 0, 0);
 		}
 	}
 
