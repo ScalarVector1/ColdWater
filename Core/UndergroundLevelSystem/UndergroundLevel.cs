@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ColdWater.Core.UndergroundLevelSystem;
+using Terraria.ModLoader.IO;
 
 namespace ColdWater.Core.UndergroundLevelSystem
 {
@@ -33,6 +34,17 @@ namespace ColdWater.Core.UndergroundLevelSystem
 		/// If the descent will end after the duration does. Can be used to add extra conditions to finishing the descent.
 		/// </summary>
 		public bool canFinishDescent = true;
+
+		public bool completed;
+
+		public List<UndergroundLevel> possiblePrevious = new();
+		public Vector2 mapLocation;
+
+		public string DisplayName => Language.GetTextValue($"Mods.{Mod.Name}.UndergroundLevels.{Name}.DisplayName");
+		public string Description => Language.GetTextValue($"Mods.{Mod.Name}.UndergroundLevels.{Name}.Description");
+
+		// Placeholder
+		public bool Available => possiblePrevious.Any(n => n.completed) || possiblePrevious.Count == 0;
 
 		public UndergroundLevel()
 		{
@@ -158,6 +170,17 @@ namespace ColdWater.Core.UndergroundLevelSystem
 		}
 
 		/// <summary>
+		/// Used to draw the decoration around this levels node on the map
+		/// </summary>
+		/// <param name="spriteBatch"></param>
+		/// <param name="center"></param>
+		/// <param name="scale"></param>
+		public virtual void DrawMapIcon(SpriteBatch spriteBatch, Vector2 center, float scale)
+		{
+
+		}
+
+		/// <summary>
 		/// World generation for the given underground level. Assume the base will be centered at the region's center.
 		/// </summary>
 		/// <param name="region"></param>
@@ -172,5 +195,15 @@ namespace ColdWater.Core.UndergroundLevelSystem
 		/// Logic that should occur every frame while in the descent
 		/// </summary>
 		public virtual void UpdateInDescent() { }
+
+		public void SaveData(TagCompound tag)
+		{
+			tag["completed"] = completed;
+		}
+
+		public void LoadData(TagCompound tag)
+		{
+			completed = tag.GetBool("completed");
+		}
 	}
 }
